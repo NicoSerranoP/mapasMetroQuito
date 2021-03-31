@@ -23,6 +23,15 @@
 			const routeURL = 'Ruta1.geojson';
 			const stationsURL = '/estaciones.geojson';
 			const logoURL = 'logoMetro.png';
+			/*
+			// Activate this when copying the HTML to the WordPress shorcode function
+			const N = '".$a['N']."'; // Time to check car position in milliseconds 1000 = 1s
+			const carURL = '".$a['carURL']."'; // [{geojson_carro_1}, {geojson_carro_2},... {geojson_carro_n}]
+			const carIconURL = '".$a['carIconURL']."';
+			const routeURL = '".$a['routeURL']."';
+			const stationsURL = '".$a['stationsURL']."';
+			const logoURL = '".$a['logoURL']."';
+			*/
 
 			mapboxgl.accessToken = 'pk.eyJ1IjoibmljbzIyc3AiLCJhIjoiY2pxZXE4cHFqMDQ2cjQzcWoybTdycG1mOSJ9.BCmKqIglS5pygsh-e7FITw';
 			var map = new mapboxgl.Map({
@@ -105,7 +114,7 @@
 					});
 					// Update car position every N seconds
 					window.setInterval( ()=>{
-						fetch('/traincar')
+						fetch(carURL)
 						.then( (response) => {
 							return response.json();
 						})
