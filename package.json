@@ -1,0 +1,25 @@
+{
+  "name": "mapasmetroquito",
+  "version": "1.0.0",
+  "description": "Código para los mapas interactivos del Metro de Quito",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "nodemon": "^2.0.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NicoSerranoP/mapasMetroQuito.git"
+  },
+  "author": "NicoSerranoP",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NicoSerranoP/mapasMetroQuito/issues"
+  },
+  "homepage": "https://github.com/NicoSerranoP/mapasMetroQuito#readme"
+}
