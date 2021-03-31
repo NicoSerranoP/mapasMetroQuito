@@ -1,9 +1,11 @@
 const express = require('express');
+const cors = require("cors");
 const fs = require('fs');
 
 let app = express();
 app.use(express.static(__dirname + '/public'));
 app.use(express.json());
+app.use(cors());
 
 let counter = 0;
 
@@ -20,6 +22,10 @@ app.get('/traincar', (request, response)=>{
   let carList = [car1, car2 ];
   counter++;
   response.json(carList);
+});
+
+app.get('/', (request, response) =>{
+  response.sendFile('./public/metro.html', {root: __dirname });
 });
 
 app.listen(process.env.PORT || 8080, ()=>{

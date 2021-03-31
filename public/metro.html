@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset='utf-8'>
-		<title>Update a feature in realtime</title>
+		<title>Metro de Quito</title>
 		<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no'>
 		<link href='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.css' rel='stylesheet'>
 		<script src='https://api.mapbox.com/mapbox-gl-js/v2.2.0/mapbox-gl.js'></script>
@@ -12,15 +12,16 @@
 		</style>
 	</head>
 	<body>
+
+		<!-- This goes in the shortcode function in WordPress as HTML with only single quotes ' ' -->
 		<div id='map'></div>
 		<script>
-
 			// Shortcode attributes sent by WordPress
 			const N = 2000; // Time to check car position in milliseconds 1000 = 1s
 			const carURL = '/traincar'; // [{geojson_carro_1}, {geojson_carro_2},... {geojson_carro_n}]
 			const carIconURL = 'iconoTren.png';
 			const routeURL = 'Ruta1.geojson';
-			const stationsURL = '/Estaciones.geojson';
+			const stationsURL = '/estaciones.geojson';
 			const logoURL = 'logoMetro.png';
 
 			mapboxgl.accessToken = 'pk.eyJ1IjoibmljbzIyc3AiLCJhIjoiY2pxZXE4cHFqMDQ2cjQzcWoybTdycG1mOSJ9.BCmKqIglS5pygsh-e7FITw';
@@ -89,7 +90,7 @@
 					},
 					'paint': {
 						'line-color': '#6086d2',
-	          "line-dasharray": [0.2, 2],
+	          'line-dasharray': [0.2, 2],
 						'line-width': 6
 					}
 				});
@@ -99,7 +100,6 @@
 					return response.json();
 				})
 				.then( (carList) => {
-					console.log(carList);
 					carList.forEach((car) => {
 						carPosition(car);
 					});
@@ -124,8 +124,10 @@
 				display.setLngLat(e.lngLat);
 				const properties = e.features[0].properties;
 				let text = '';
-				text = text + '<h6 style="background: #223E77; color: #ffffff; font-size: large; text-transform: capitalize; border-radius: 2px; padding-left: 3px; padding-top: 1px; margin: 0px;">Nombre:</h6><h2 style="font-weight: 500;"><small>'+ e.features[0].properties['marker_title'] + '</small></h2>';
-				text = text + '<h6 style="background: #223E77; color: #ffffff; font-size: large; text-transform: capitalize; border-radius: 2px; padding-left: 3px; padding-top: 1px; margin: 0px;">Descripción:</h6><h2 style="font-weight: 500;"><small>'+ e.features[0].properties['description'] + '</small></h2>';
+				for(key in properties){
+		      if(key != 'id' && key != 'geometry')
+		      text = text + '<h6 style=\"background: #223E77; color: #ffffff; font-size: large; text-transform: capitalize; border-radius: 2px; padding-left: 3px; padding-top: 1px; margin: 0px;\">' + key.split('_').join(' ') + ':</h6><h2 style=\"font-weight: 500;\"><small>'+ e.features[0].properties[key] + '</small></h2>';
+			  }
 				display.setHTML(text);
 				display.addTo(map);
 				map.on('tocuhstart', function(){
