@@ -20,6 +20,6 @@ app.get('/traincar', (request, response)=>{
   response.json(carList);
 });
 
-app.listen(8080, ()=>{
-  console.log('Express app on port:' + 8080);
+app.listen(process.env.PORT || 8080, ()=>{
+  console.log('Express app initialized');
 });
