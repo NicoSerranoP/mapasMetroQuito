@@ -14,14 +14,23 @@
 	<body>
 		<div id='map'></div>
 		<script>
+
+			// Shortcode attributes sent by WordPress
+			const N = 2000;
+			const carURL = '/traincar'; // [{geojson_carro_1}, {geojson_carro_2},... {geojson_carro_n}]
+			const carIconURL = 'iconoTren.png';
+			const routeURL = 'Ruta1.geojson';
+			const stationsURL = '/Estaciones.geojson';
+			const logoURL = 'logoMetro.png';
+
 			mapboxgl.accessToken = 'pk.eyJ1IjoibmljbzIyc3AiLCJhIjoiY2pxZXE4cHFqMDQ2cjQzcWoybTdycG1mOSJ9.BCmKqIglS5pygsh-e7FITw';
 			var map = new mapboxgl.Map({
 				container: 'map',
 				style: 'mapbox://styles/mapbox/dark-v10',
 				zoom: 11,
 				center: [-78.52, -0.25],
-				//maxBounds: [[-78.716222, -0.395355],[-78.300938, -0.051049]],
 				pitch: 50,
+				//maxBounds: [[-78.716222, -0.395355],[-78.300938, -0.051049]],
 			});
 
 			map.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
@@ -34,11 +43,11 @@
 
 			map.on('load', function () {
 				// Load metro stations
-				map.loadImage('logoMetro.png', function(err, image){
+				map.loadImage(logoURL, function(err, image){
 					map.addImage('logo_metro', image);
 					map.addSource('metro_estaciones', {
 						'type': 'geojson',
-						'data': '/Estaciones.geojson', // Shortcode attribute estaciones = ''
+						'data': stationsURL,
 					});
 					map.addLayer({
 						'id': 'metro_estaciones',
@@ -47,7 +56,7 @@
 						'layout': {
 							'icon-image': 'logo_metro',
 							'icon-size': 0.09,
-							'icon-allow-overlap': true,
+							//'icon-allow-overlap': true, //Show all icons at once
 						}
 					});
 					map.on('click', 'metro_estaciones', function(e){
@@ -68,7 +77,7 @@
 				// Load Polyline Routes
 				map.addSource('ruta_1', {
 					'type': 'geojson',
-					'data': 'Ruta1.geojson' // Shortcode attribute ruta = ''
+					'data':  routeURL
 				});
 				map.addLayer({
 					'id': 'ruta_1',
@@ -79,23 +88,34 @@
 						'line-cap': 'round'
 					},
 					'paint': {
-						'line-color': '#F2F3F4',
-						'line-width': 8
+						'line-color': '#6086d2',
+	          "line-dasharray": [0.2, 2],
+						'line-width': 6
 					}
 				});
-				// TODO: Load Train Cars Positions
-				cars = get('url_carros') //TODO: make get work!
-				cars.forEach((item) => {
-					trainPosition(car);
-				});
-				// Update train car position every N times
-				window.setInverval(()=>{
-					car = get('url_carros'); //TODO: make get work!
-					forEach((item) => {
-						map.getSource(item.properties.nombre).setData(item);
+				// Load Train Cars Positions
+				fetch(carURL)
+				.then( (response) => {
+					return response.json();
+				})
+				.then( (carList) => {
+					console.log(carList);
+					carList.forEach((car) => {
+						carPosition(car);
 					});
-				}, 10);				
-
+					// Update car position every N seconds
+					window.setInterval( ()=>{
+						fetch('/traincar')
+						.then( (response) => {
+							return response.json();
+						})
+						.then( (carList) => {
+							carList.forEach((car) => {
+								map.getSource(car.properties.Name).setData(car);
+							});
+						});
+					}, N);
+				});
 			});
 
 			function pointClick(e){
@@ -116,35 +136,34 @@
 				});
 			}
 
-			// Shortcode attribute carros = '' => [{geojson_carro_1}, {geojson_carro_2},... {geojson_carro_n}]
-			function trainPosition(car){
-				map.loadImage('iconoTren.png', function(err, image){
-					map.addImage('icono_tren', image);
-					map.addSource(car.properties.nombre, {
+			function carPosition(car){
+				map.loadImage(carIconURL, function(err, image){
+					map.addImage('icono_tren'+car.properties.Name, image);
+					map.addSource(car.properties.Name, {
 						'type': 'geojson',
 						'data': car,
 					});
 					map.addLayer({
-						'id': car.properties.nombre,
+						'id': car.properties.Name,
 						'type': 'symbol',
-						'source': car.properties.nombre,
+						'source': car.properties.Name,
 						'layout': {
-							'icon-image': 'icono_tren',
+							'icon-image': 'icono_tren'+car.properties.Name,
 							'icon-size': 0.09,
 							'icon-allow-overlap': true,
 						}
 					});
-					map.on('click', car.properties.nombre, function(e){
+					map.on('click', car.properties.Name, function(e){
 				    pointClick(e);
 				  });
 				  //for touchpads and smartphones
-				  map.on('touchend', car.properties.nombre, function(e){
+				  map.on('touchend', car.properties.Name, function(e){
 				    pointClick(e);
 				  });
-				  map.on('mouseenter', car.properties.nombre, function (){
+				  map.on('mouseenter', car.properties.Name, function (){
 				    map.getCanvas().style.cursor = 'pointer';
 				  });
-				  map.on('mouseleave', 'metro_estaciones', function (){
+				  map.on('mouseleave', car.properties.Name, function (){
 				    map.getCanvas().style.cursor = '';
 				  });
 				});
